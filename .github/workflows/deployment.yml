@@ -1,0 +1,62 @@
+name: Deployment pipeline
+
+env:
+  IS_DEPLOY: ${{ (github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip')) || (github.event_name == 'pull_request' && !contains(github.event.pull_request.title, '#skip') && !contains(github.event.pull_request.body, '#skip')) }}
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+
+jobs:
+  simple_deployment_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check style
+        run: npm run lint
+
+      - name: Make a build
+        run: npm run build
+
+      - name: Bump version and push tag
+        if: ${{ env.IS_DEPLOY == 'true' }}
+        uses: anothrNick/github-tag-action@1.64.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Vercel CLI
+        if: ${{ env.IS_DEPLOY == 'true' }}
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel
+        if: ${{ env.IS_DEPLOY == 'true' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prod --token $VERCEL_TOKEN --yes
+
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          nodetail: true
+          status: ${{ job.status }}
+          title: ${{ job.status == 'success' && '🚀 A new version deployed' || '❌ Build failed' }}
+          color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}
+          description: |
+            **Commit:** [${{ github.sha }}](${{ github.event.head_commit.url }})  
+            **Author:** ${{ github.event.head_commit.author.name }}  
+            **Message:** ${{ github.event.head_commit.message }}
+
+ 
