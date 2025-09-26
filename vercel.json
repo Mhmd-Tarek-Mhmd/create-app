@@ -1,7 +1,11 @@
 {
-  "build": {
-    "env": {
-      "NODE_VERSION": "22"
-    }
+  "version": 2,
+  "builds": [
+    { "src": "package.json", "use": "@vercel/static-build" }
+  ],
+  "buildCommand": "yarn build",
+  "outputDirectory": "dist",
+  "env": {
+    "NODE_VERSION": "22"
   }
 }
