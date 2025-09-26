@@ -1,6 +1,8 @@
 # create-app
 Simple boilerplate
 
+Start With [SUBMISSION.md](./SUBMISSION.md) for more details.
+
 # What?
 
 This boilerplate contains `React`, `express`, the required dependencies and a small amount of useful ones.
