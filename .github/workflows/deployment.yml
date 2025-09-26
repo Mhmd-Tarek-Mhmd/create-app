@@ -21,13 +21,13 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        run: npm install
+        run: yarn
 
       - name: Check style
-        run: npm run lint
+        run: yarn lint
 
       - name: Make a build
-        run: npm run build
+        run: yarn build
 
       - name: Bump version and push tag
         if: ${{ env.IS_DEPLOY == 'true' }}
@@ -58,5 +58,3 @@ jobs:
             **Commit:** [${{ github.sha }}](${{ github.event.head_commit.url }})  
             **Author:** ${{ github.event.head_commit.author.name }}  
             **Message:** ${{ github.event.head_commit.message }}
-
- 
