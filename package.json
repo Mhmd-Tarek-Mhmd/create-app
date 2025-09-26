@@ -14,7 +14,7 @@
     "node": "18.x"
   },
   "resolutions": {
-    "minimatch": "^9.0.3"
+    "minimatch": "^9.0.5"
   },
   "author": "Jami Kousa",
   "license": "ISC",
